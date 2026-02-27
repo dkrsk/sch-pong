@@ -20,15 +20,32 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
             } else if (x == screen_width / 2) {
                 printf("|");  // Separator
             } else if (x == screen_width / 2 - 3 && y == score_y_pos) {
-                int offset = printf("%d", score1); // Score plr1
+                int offset = printf("%d", score1);  // Score plr1
                 x += offset - 1;
             } else if (x == screen_width / 2 + 3 && y == score_y_pos) {
-                int offset = printf("%d", score2); // Score plr2
+                int offset = printf("%d", score2);  // Score plr2
                 x += offset - 1;
             } else
                 printf(" ");
         }
         printf("\n");
+    }
+}
+
+void DrawWin(int winner) {
+    printf("\e[H");
+    if (winner == 0) {
+        printf(
+            "  _____ ___   __          _______ _   _ _ \n |  __ \\__ \\  \\ \\        / /_   _| \\ | | |\n | "
+            "|__) | ) |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ / /    \\ \\/  \\/ /   | | | . ` | |\n | "
+            "|    / /_     \\  /\\  /   _| |_| |\\  |_|\n |_|   |____|     \\/  \\/   |_____|_| \\_(_)\n     "
+            "                                     \n                                          ");
+    } else {
+        printf(
+            "  _____  __  __          _______ _   _ _ \n |  __ \\/_ | \\ \\        / /_   _| \\ | | |\n | "
+            "|__) || |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ | |   \\ \\/  \\/ /   | | | . ` | |\n | |  "
+            "   | |    \\  /\\  /   _| |_| |\\  |_|\n |_|     |_|     \\/  \\/   |_____|_| \\_(_)\n          "
+            "                               \n                                         ");
     }
 }
 
