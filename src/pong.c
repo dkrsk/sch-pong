@@ -5,7 +5,7 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
     const int screen_width = 80;
     const int screen_height = 25;
     const int paddle_size = 3;
-    const int scrore_y_pos = 7;
+    const int score_y_pos = 7;
 
     printf("\e[H");  // Clear space
 
@@ -19,10 +19,10 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
                 printf("|");  // Right paddle
             } else if (x == screen_width / 2) {
                 printf("|");  // Separator
-            } else if (x == screen_width / 2 - 3 && y == scrore_y_pos) {
+            } else if (x == screen_width / 2 - 3 && y == score_y_pos) {
                 int offset = printf("%d", score1); // Score plr1
                 x += offset - 1;
-            } else if (x == screen_width / 2 + 3 && y == scrore_y_pos) {
+            } else if (x == screen_width / 2 + 3 && y == score_y_pos) {
                 int offset = printf("%d", score2); // Score plr2
                 x += offset - 1;
             } else
@@ -37,7 +37,6 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
 void Update(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2);
 
 int main() {
-    Draw(2, 3, 10, 8, 0, 15);
     // Инициализация и бесконечный цикл: draw -> update
     // Проверка score и выбор победителя
     return 0;
