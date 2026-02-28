@@ -5,10 +5,14 @@
 #define WIN_SCR 21
 
 // --- ЗОНА 1: Отрисовка ---
+void ClearSpace() {
+    printf("\033[H\033[2J\033[3J");
+}
+
 void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2) {
     const int score_y_pos = 7;
 
-    printf("\033[H\033[2J\033[3J");  // Clear space
+    ClearSpace();  // Clear space
 
     for (int y = 0; y < SCR_HG; y++) {
         for (int x = 0; x < SCR_WD; x++) {
@@ -33,21 +37,22 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
     }
 }
 
-void DrawWin(int winner) {
-    printf("\e[H");
+void DrawWin(int winner, int score1, int score2) {
+    ClearSpace();
     if (winner == 1) {
         printf(
             "  _____ ___   __          _______ _   _ _ \n |  __ \\__ \\  \\ \\        / /_   _| \\ | | |\n | "
             "|__) | ) |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ / /    \\ \\/  \\/ /   | | | . ` | |\n | "
             "|    / /_     \\  /\\  /   _| |_| |\\  |_|\n |_|   |____|     \\/  \\/   |_____|_| \\_(_)\n     "
-            "                                     \n                                          ");
+            "                                     \n                                          \n");
     } else {
         printf(
             "  _____  __  __          _______ _   _ _ \n |  __ \\/_ | \\ \\        / /_   _| \\ | | |\n | "
             "|__) || |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ | |   \\ \\/  \\/ /   | | | . ` | |\n | |  "
             "   | |    \\  /\\  /   _| |_| |\\  |_|\n |_|     |_|     \\/  \\/   |_____|_| \\_(_)\n          "
-            "                               \n                                         ");
+            "                               \n                                         \n");
     }
+    printf("SCORE ==> %d : %d", score1, score2);
 }
 
 // --- ЗОНА 2: Проверка ввода ---
@@ -179,6 +184,6 @@ int main() {
             }
         }
     }
-    DrawWin(winner);
+    DrawWin(winner, score1, score2);
     return 0;
 }
