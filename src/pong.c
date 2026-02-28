@@ -2,7 +2,7 @@
 #define SCR_WD 80
 #define SCR_HG 25
 #define PDL_SIZE 3
-#define WIN_SCR 21
+#define WIN_SCR 2
 
 // --- ЗОНА 1: Отрисовка ---
 void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2) {
@@ -143,12 +143,10 @@ int CheckGoal(int ball_x, int ball_y) {
 }
 
 int main() {
-    int ball_x = SCR_WD / 2 - 1;
+    int ball_x = SCR_WD / 2 - 2;
     int ball_y = SCR_HG / 2;
-    int ball_x_direction = -1;
-    int ball_y_direction = 1;
-    int player1_pos = SCR_HG / 2;
-    int player2_pos = SCR_HG / 2;
+    int ball_x_direction = -1, ball_y_direction = 1;
+    int player1_pos = SCR_HG / 2, player2_pos = SCR_HG / 2;
     int score1 = 0, score2 = 0;
     int winner;
 
@@ -165,8 +163,7 @@ int main() {
                 player2_pos += player_direction;
             }
 
-            ball_x_direction =
-                GetBallDirectionX(ball_x_direction, ball_x, ball_y, player1_pos, player2_pos);
+            ball_x_direction = GetBallDirectionX(ball_x_direction, ball_x, ball_y, player1_pos, player2_pos);
             ball_y_direction = GetBallDirectionY(ball_y_direction, ball_y);
 
             ball_x += ball_x_direction;
@@ -175,16 +172,16 @@ int main() {
             int goal_result = CheckGoal(ball_x, ball_y);
             if(goal_result != 0)
             {
-                score1 += goal_result % 10;
-                score2 += goal_result / 10;
-                ball_x = SCR_WD / 2 - 1;
+                int tmp1 = goal_result % 10;
+                int tmp2 = goal_result / 10;
+                score1 += tmp1;
+                score2 += tmp2;
+                ball_x = SCR_WD / 2 + 2*tmp1 - 2*tmp2;
                 ball_y = SCR_HG / 2;
             }
         }
     }
-
     DrawWin(winner);
-
     return 0;
 }
 
