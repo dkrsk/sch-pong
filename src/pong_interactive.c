@@ -6,53 +6,61 @@
 #define WIN_SCR 21
 
 // --- ЗОНА 1: Отрисовка ---
+// --- ЗОНА 1: Отрисовка (Интерактивная) ---
 void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2) {
-    const int score_y_pos = 7;
+    const int score_y_pos = 1; // Поднимем счет повыше для удобства
 
-    clear();  // Clear space
+    // Быстрая очистка внутреннего буфера ncurses
+    erase(); 
 
+    // 1. Отрисовка центральной линии (разделителя)
     for (int y = 0; y < SCR_HG; y++) {
-        for (int x = 0; x < SCR_WD; x++) {
-            if (x == ball_x && y == ball_y) {  // Ball
-                printw("*");
-            } else if (x == 0 && y >= player1_pos && y < player1_pos + PDL_SIZE) {
-                printw("|");  // Left paddle
-            } else if (x == SCR_WD - 1 && y >= player2_pos && y < player2_pos + PDL_SIZE) {
-                printw("|");  // Right paddle
-            } else if (x == SCR_WD / 2) {
-                printw("|");  // Separator
-            } else if (x == SCR_WD / 2 - 3 && y == score_y_pos) {
-                int offset = printw("%d", score1);  // Score plr1
-                x += offset - 1;
-            } else if (x == SCR_WD / 2 + 3 && y == score_y_pos) {
-                int offset = printw("%d", score2);  // Score plr2
-                x += offset - 1;
-            } else
-                printw(" ");
-        }
-        printw("\n");
+        mvaddch(y, SCR_WD / 2, '|');
     }
-    refresh();
+
+    // 2. Отрисовка ракеток (только там, где они есть)
+    for (int i = 0; i < PDL_SIZE; i++) {
+        mvaddch(player1_pos + i, 0, '#');           // Левая (используем # для видимости)
+        mvaddch(player2_pos + i, SCR_WD - 1, '#');  // Правая
+    }
+
+    // 3. Отрисовка счета
+    mvprintw(score_y_pos, SCR_WD / 2 - 5, "%d", score1);
+    mvprintw(score_y_pos, SCR_WD / 2 + 4, "%d", score2);
+
+    // 4. Отрисовка мяча
+    mvaddch(ball_y, ball_x, 'O');
+
+    // Перенос всех изменений из буфера на физический экран терминала
+    refresh(); 
 }
 
 void DrawWin(int winner) {
-    printw("\e[H");
+    clear(); // Полная очистка перед финальным экраном
+    
+    // Вместо \e[H используем move(0,0) или просто mvprintw
+    int start_y = SCR_HG / 2 - 4;
+    int start_x = SCR_WD / 2 - 20;
+
     if (winner == 1) {
-        printw(
-            "  _____ ___   __          _______ _   _ _ \n |  __ \\__ \\  \\ \\        / /_   _| \\ | | |\n | "
-            "|__) | ) |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ / /    \\ \\/  \\/ /   | | | . ` | |\n | "
-            "|    / /_     \\  /\\  /   _| |_| |\\  |_|\n |_|   |____|     \\/  \\/   |_____|_| \\_(_)\n     "
-            "                                     \n                                          ");
+        mvprintw(start_y + 0, start_x, "  _____ ___   __          _______ _   _ _ ");
+        mvprintw(start_y + 1, start_x, " |  __ \\__ \\  \\ \\        / /_   _| \\ | | |");
+        mvprintw(start_y + 2, start_x, " | |__) | ) |  \\ \\  /\\  / /  | | |  \\| | |");
+        mvprintw(start_y + 3, start_x, " |  ___/ / /    \\ \\/  \\/ /   | | | . ` | |");
+        mvprintw(start_y + 4, start_x, " | |    / /_     \\  /\\  /   _| |_| |\\  |_|");
+        mvprintw(start_y + 5, start_x, " |_|   |____|     \\/  \\/   |_____|_| \\_(_)");
     } else {
-        printw(
-            "  _____  __  __          _______ _   _ _ \n |  __ \\/_ | \\ \\        / /_   _| \\ | | |\n | "
-            "|__) || |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ | |   \\ \\/  \\/ /   | | | . ` | |\n | |  "
-            "   | |    \\  /\\  /   _| |_| |\\  |_|\n |_|     |_|     \\/  \\/   |_____|_| \\_(_)\n          "
-            "                               \n                                         ");
+        mvprintw(start_y + 0, start_x, "  _____  __  __          _______ _   _ _ ");
+        mvprintw(start_y + 1, start_x, " |  __ \\/_ | \\ \\        / /_   _| \\ | | |");
+        mvprintw(start_y + 2, start_x, " | |__) || |  \\ \\  /\\  / /  | | |  \\| | |");
+        mvprintw(start_y + 3, start_x, " |  ___/ | |   \\ \\/  \\/ /   | | | . ` | |");
+        mvprintw(start_y + 4, start_x, " | |     | |    \\  /\\  /   _| |_| |\\  |_|");
+        mvprintw(start_y + 5, start_x, " |_|     |_|     \\/  \\/   |_____|_| \\_(_)");
     }
+    
+    mvprintw(SCR_HG - 2, SCR_WD / 2 - 12, "Press any key to exit...");
     refresh();
 }
-
 // --- ЗОНА 2: Проверка ввода ---
 
 int Input() {
@@ -150,7 +158,7 @@ int main() {
     int ball_x_direction = -1, ball_y_direction = 1;
     int player1_pos = SCR_HG / 2, player2_pos = SCR_HG / 2;
     int score1 = 0, score2 = 0, winner;
-    timeout(40);
+    timeout(100);
 
 
     while ((winner = CheckWin(score1, score2)) == -1) {
