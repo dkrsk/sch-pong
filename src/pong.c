@@ -158,9 +158,12 @@ int main() {
             int which_player = DetectWhichPlayer(input);
             int player_direction = GetDirectionByInput(input);
             if (which_player == 1) {
-                player1_pos += player_direction;
-            } else if (which_player == 2) {
-                player2_pos += player_direction;
+                if (player_direction == -1 && player1_pos > 0) player1_pos -= 1;
+                if (player_direction == 1 && player1_pos < SCR_HG - 3) player1_pos += 1;
+            }
+            else if (which_player == 2) {
+                if (player_direction == -1 && player2_pos > 0) player2_pos -= 1;
+                if (player_direction == 1 && player2_pos < SCR_HG - 3) player2_pos += 1;
             }
 
             ball_x_direction = GetBallDirectionX(ball_x_direction, ball_x, ball_y, player1_pos, player2_pos);
