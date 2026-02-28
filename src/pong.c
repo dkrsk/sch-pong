@@ -7,26 +7,31 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
 
 int Input() {
     char kbs = getchar ();
-    while (getchar() != '\n')
-    int shifr = -1;
+    int input_code = -1;
 
-    if (kbs == 'A' || kbs == 'a') {
-        shifr = 11;  
-    }
-    else if (kbs == 'Z' || kbs == 'z') {
-        shifr = -11; 
-    }
-    else if (kbs == 'K' || kbs == 'k') {
-        shifr = 12;  
-    }
-    else if (kbs == 'M' || kbs == 'm') {
-        shifr = -12; 
-    }
-    else if (kbs == ' ') {
-        shifr = 0;   
+    while(1) {
+        if (kbs == 'A' || kbs == 'a') {
+            input_code = 11;  
+        }
+        else if (kbs == 'Z' || kbs == 'z') {
+            input_code = -11; 
+        }
+        else if (kbs == 'K' || kbs == 'k') {
+            input_code = 12;  
+        }
+        else if (kbs == 'M' || kbs == 'm') {
+            input_code = -12; 
+        }
+        else if (kbs == ' ') {
+            input_code = 0;   
+        }
+        if(input_code != -1){
+            break;
+        }
     }
     
-    return shifr;  
+    
+    return input_code;  
 }
 
 int DetectWhichPlayer(int input) {  
