@@ -58,7 +58,7 @@ void DrawWin(int winner, int score1, int score2) {
 int Input() {
     int input_code = -1;
 
-    char kbs;
+    int kbs;
 
     while (input_code == -1) {
         kbs = getchar();
