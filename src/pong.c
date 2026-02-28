@@ -2,12 +2,13 @@
 #define SCR_WD 80
 #define SCR_HG 25
 #define PDL_SIZE 3
+#define WIN_SCR 21
 
 // --- ЗОНА 1: Отрисовка ---
 void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2) {
     const int score_y_pos = 7;
 
-    printf("\e[H");  // Clear space
+    printf("\033[H\033[2J\033[3J");  // Clear space
 
     for (int y = 0; y < SCR_HG; y++) {
         for (int x = 0; x < SCR_WD; x++) {
@@ -34,7 +35,7 @@ void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, 
 
 void DrawWin(int winner) {
     printf("\e[H");
-    if (winner == 0) {
+    if (winner == 1) {
         printf(
             "  _____ ___   __          _______ _   _ _ \n |  __ \\__ \\  \\ \\        / /_   _| \\ | | |\n | "
             "|__) | ) |  \\ \\  /\\  / /  | | |  \\| | |\n |  ___/ / /    \\ \\/  \\/ /   | | | . ` | |\n | "
@@ -52,31 +53,34 @@ void DrawWin(int winner) {
 // --- ЗОНА 2: Проверка ввода ---
 
 int Input() {
-    char kbs = getchar ();
     int input_code = -1;
 
-    while(1) {
+    char kbs;
+
+    while(input_code == -1) {
+        kbs = getchar();
+
         if (kbs == 'A' || kbs == 'a') {
-            input_code = 11;  
+            input_code = -11;  
         }
         else if (kbs == 'Z' || kbs == 'z') {
-            input_code = -11; 
+            input_code = 11; 
         }
         else if (kbs == 'K' || kbs == 'k') {
-            input_code = 12;  
+            input_code = -12;  
         }
         else if (kbs == 'M' || kbs == 'm') {
-            input_code = -12; 
+            input_code = 12; 
         }
         else if (kbs == ' ') {
-            input_code = 0;   
+            input_code = 0;
         }
-        if(input_code != -1){
-            break;
+        else if (kbs == '\n') {
+            input_code = -2;
         }
     }
     
-    
+    while ((kbs = getchar()) != '\n' && kbs != EOF); 
     return input_code;  
 }
 
@@ -102,32 +106,9 @@ int GetDirectionByInput (int input) {
 //
 
 // --- ЗОНА 3: Обработка ориентации движения ---
-int GetBallDirectionX(int x, int ball_x, int ball_y, int player1_pos, int player2_pos, int paddle_size, int screen_width);
-int GetBallDirectionY(int y, int ball_y, int screen_height);
-
-// -- ЗОНА 4: Проверка гола и победы --
-int CheckWin(int score1, int score2) {
-    int win_score = 21;
-    int winner = -1;
-    if (score1 >= win_score) winner = 1;
-    else if (score2 >= win_score) winner = 2;
-    return winner;
-}
-
-int CheckGoal(int ball_x, int ball_y) {
-    int score1 = 0;
-    int score2 = 0;
-    if (ball_x <= 0) score2++;
-    if (ball_x >= screen_width - 1) score1++;
-    
-    return score2 * 10 + score1;
-
-
-}
-
-int DirectionX(int x, int ball_x, int ball_y, int player1_pos, int player2_pos, int paddle_size, int screen_width) {
-    bool drpl1 = (ball_x == 1 && ball_y >= player1_pos && ball_y < player1_pos + paddle_size);
-    bool drpl2 = (ball_x == screen_width - 2 && ball_y >= player2_pos && ball_y < player2_pos + paddle_size);
+int GetBallDirectionX(int x, int ball_x, int ball_y, int player1_pos, int player2_pos) {
+    int drpl1 = (ball_x == 1 && ball_y >= player1_pos && ball_y < player1_pos + PDL_SIZE);
+    int drpl2 = (ball_x == SCR_WD - 2 && ball_y >= player2_pos && ball_y < player2_pos + PDL_SIZE);
     
     if (drpl1 || drpl2) {
         x = -x;
@@ -135,62 +116,74 @@ int DirectionX(int x, int ball_x, int ball_y, int player1_pos, int player2_pos, 
     return x;
 }
 
-int DirectionY(int y, int ball_y, int screen_height) {
-    if (ball_y == 0 || ball_y == screen_height - 1) {
+int GetBallDirectionY(int y, int ball_y) {
+    if (ball_y == 0 || ball_y == SCR_HG - 1) {
         y = -y;
     }
     return y;
 }
 
-/*  ЭТО В main
-    if (ball_x <= 0) {
-        score2++;
-        ball_x = screen_width/2 -1;
-        ball_y = screen_height/2;
-    }
-    if (ball_x >= screen_width - 1) {
-        score1++;
-        ball_x = screen_width/2 +1;
-        ball_y = screen_height/2;
-    }
-*/
+// -- ЗОНА 4: Проверка гола и победы --
+int CheckWin(int score1, int score2) {
+    int winner = -1;
+    if (score1 >= WIN_SCR) winner = 1;
+    else if (score2 >= WIN_SCR) winner = 2;
+    return winner;
+}
+
+int CheckGoal(int ball_x, int ball_y) {
+    int score1 = 0;
+    int score2 = 0;
+    if (ball_x <= 0) score2++;
+    if (ball_x >= SCR_WD - 1) score1++;
+    
+    return score2 * 10 + score1;
+
+
+}
 
 int main() {
-    int ball_x = 0;
-    int ball_y = 0;
+    int ball_x = SCR_WD / 2 - 1;
+    int ball_y = SCR_HG / 2;
     int ball_x_direction = -1;
     int ball_y_direction = 1;
-    int player1_pos = 0;
-    int player2_pos = 0;
-    int score1, score2 = 0;
+    int player1_pos = SCR_HG / 2;
+    int player2_pos = SCR_HG / 2;
+    int score1 = 0, score2 = 0;
     int winner;
 
     while ((winner = CheckWin(score1, score2)) == -1) {
         Draw(ball_x, ball_y, player1_pos, player2_pos, score1, score2);
 
         int input = Input();
+        if(input != -2){
+            int which_player = DetectWhichPlayer(input);
+            int player_direction = GetDirectionByInput(input);
+            if (which_player == 1) {
+                player1_pos += player_direction;
+            } else if (which_player == 2) {
+                player2_pos += player_direction;
+            }
 
-        int which_player = DetectWhitchPlayer(input);
-        int player_direction = GetDirectionByInput(input);
-        if (which_player == 1) {
-            player1_pos += player_direction;
-        } else if (which_player == 2) {
-            player2_pos += player_direction;
+            ball_x_direction =
+                GetBallDirectionX(ball_x_direction, ball_x, ball_y, player1_pos, player2_pos);
+            ball_y_direction = GetBallDirectionY(ball_y_direction, ball_y);
+
+            ball_x += ball_x_direction;
+            ball_y += ball_y_direction;
+
+            int goal_result = CheckGoal(ball_x, ball_y);
+            if(goal_result != 0)
+            {
+                score1 += goal_result % 10;
+                score2 += goal_result / 10;
+                ball_x = SCR_WD / 2 - 1;
+                ball_y = SCR_HG / 2;
+            }
         }
-
-        ball_x_direction =
-            GetBallDirectionX(ball_x_direction, ball_x, ball_y, player1_pos, player2_pos, 3, 85);
-        ball_y_direction = GetBallDirectionY(ball_y_direction, ball_y, 85);
-
-        ball_x += ball_x_direction;
-        ball_y += ball_y_direction;
-
-        int goal_result = CheckGoal(ball_x, ball_y);
-        score1 += goal_result / 10;
-        score2 += goal_result % 10;
     }
 
-    // DrawWinner();
+    DrawWin(winner);
 
     return 0;
 }
