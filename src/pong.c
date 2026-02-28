@@ -5,9 +5,7 @@
 #define WIN_SCR 21
 
 // --- ЗОНА 1: Отрисовка ---
-void ClearSpace() {
-    printf("\033[H\033[2J\033[3J");
-}
+void ClearSpace() { printf("\033[H\033[2J\033[3J"); }
 
 void Draw(int ball_x, int ball_y, int player1_pos, int player2_pos, int score1, int score2) {
     const int score_y_pos = 7;
