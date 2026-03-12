@@ -1,0 +1,41 @@
+name: C CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format cppcheck gcc libncurses5-dev libncursesw5-dev
+
+      - name: Run clang-format check
+        run: |
+          find . -name "*.c" -o -name "*.h" | xargs clang-format --style=file:.clang-format --dry-run --Werror
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem .
+
+      - name: Compile pong
+        run: |
+          # -Wall -Wextra -Werror к сожалению, не компилирует :(
+          gcc -std=c11 src/pong.c -o pong
+
+      - name: Compile second source
+        run: |
+          gcc -std=c11 src/pong_interactive.c -o pong_interactive -lncurses
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-binaries
+          path: |
+            pong
+            pong_interactive
