@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format cppcheck gcc libncurses5-dev libncursesw5-dev
+          sudo apt-get install -y clang-format cppcheck gcc libncurses-dev libtinfo-dev
 
       - name: Run clang-format check
         run: |
@@ -28,14 +28,15 @@ jobs:
           # -Wall -Wextra -Werror к сожалению, не компилирует :(
           gcc -std=c11 src/pong.c -o pong
 
-      - name: Compile second source
+      - name: Compile interactive
         run: |
-          gcc -std=c11 src/pong_interactive.c -o pong_interactive -lncurses
+          gcc -std=c11 src/pong_interactive.c -o pong_interactive \
+              -Wl,-Bstatic -lncurses -ltinfo -Wl,-Bdynamic
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: c-binaries
+          name: linux-binaries
           path: |
             pong
             pong_interactive
